@@ -1,0 +1,15 @@
+spring.application.name=sbe
+
+# Database (must match docker-compose.yml)
+spring.datasource.url=jdbc:postgresql://localhost:7654/sbedb
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+
+# Hibernate
+# create = tables are dropped and recreated on every start (fine while developing)
+# update = keeps the data between restarts
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.open-in-view=false
+
+## Locale
+spring.jackson.time-zone=Europe/Lisbon
