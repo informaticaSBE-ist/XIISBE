@@ -10,7 +10,9 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "cypress": "cypress open",
+    "test:e2e": "cypress run"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -29,9 +31,12 @@
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/tsconfig": "^0.5.1",
+    "cypress": "^13.17.0",
     "eslint": "^8.57.0",
+    "eslint-plugin-cypress": "^3.6.0",
     "eslint-plugin-vue": "^9.23.0",
     "npm-run-all2": "^6.1.2",
+    "pg": "^8.23.1",
     "prettier": "^3.2.5",
     "typescript": "~5.4.0",
     "vite": "^6.2.0",

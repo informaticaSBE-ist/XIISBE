@@ -25,9 +25,10 @@
     item-value="id"
     class="text-left"
     no-data-text="Sem pessoas a apresentar."
+    data-cy="peopleTable"
   >
     <template v-slot:[`item.actions`]="{ item }">
-      <v-icon @click="deletePerson(item)">mdi-delete</v-icon>
+      <v-icon @click="deletePerson(item)" data-cy="deleteButton">mdi-delete</v-icon>
     </template>
   </v-data-table>
 </template>

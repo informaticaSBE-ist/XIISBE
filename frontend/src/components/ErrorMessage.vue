@@ -1,6 +1,12 @@
 <template>
   <v-dialog v-model="show">
-    <v-alert v-model="show" type="error" closable close-text="Fechar alerta">
+    <v-alert
+      v-model="show"
+      type="error"
+      closable
+      close-text="Fechar alerta"
+      data-cy="errorMessage"
+    >
       {{ appearanceStore.currentErrorMessage ?? '??' }}
     </v-alert>
   </v-dialog>

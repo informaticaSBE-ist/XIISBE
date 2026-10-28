@@ -46,6 +46,33 @@ mvn clean spring-boot:run
 
 The backend runs on http://localhost:8080 (try http://localhost:8080/people).
 
+### Backend tests
+
+The tests are written with [Spock](https://spockframework.org/) (Groovy).
+
+Unit tests (`*Test`): domain and service, run on an in-memory H2 database, so no Docker needed:
+
+```bash
+cd ./backend
+mvn clean -Ptest test
+```
+
+Integration tests (`*IT`): webservice, start the whole backend and call it over HTTP. They use the
+database from `application.properties`, so start it first (`docker compose up -d`). They **delete all the data** in it:
+
+```bash
+cd ./backend
+mvn clean -Ptest-int verify
+```
+
+A single class or method:
+
+```bash
+mvn clean -Ptest test -Dtest=CreatePersonServiceTest
+mvn clean -Ptest test -Dtest='CreatePersonServiceTest#create person'
+mvn clean -Ptest-int verify -Dit.test=CreatePersonWebServiceIT
+```
+
 ### Frontend
 
 Create your local config from the example (only once):
@@ -63,6 +90,31 @@ npm run dev
 ```
 
 Open the address printed in the terminal (usually http://localhost:5173).
+
+### Frontend tests
+
+End-to-end tests with [Cypress](https://www.cypress.io/): they open the app in a browser,
+click through it and check what shows up. The specs are in `frontend/tests/e2e/specs/`.
+
+Create your local config from the example (only once). The values already match `docker-compose.yml`:
+
+```bash
+cp ./frontend/cypress.env.json.example ./frontend/cypress.env.json
+```
+
+The database, backend and frontend must all be running (see above). The tests **delete all the people** in the database.
+
+```bash
+cd ./frontend
+npm run cypress      # opens the Cypress window, pick a spec and watch it run
+npm run test:e2e     # runs every spec in the terminal
+```
+
+If `npm i` skipped the Cypress download, run `npx cypress install`.
+If Cypress fails with `bad option: --smoke-test` (it happens in the VS Code terminal), run it from a
+normal terminal, or clear the variable first: `$env:ELECTRON_RUN_AS_NODE=""` (PowerShell) / `unset ELECTRON_RUN_AS_NODE` (bash).
+
+Elements are found by their `data-cy` attribute (e.g. `<v-btn data-cy="createButton">` → `cy.get('[data-cy="createButton"]')`).
 
 ## Access the Database
 
@@ -84,22 +136,22 @@ backend/src/main/java/pt/ulisboa/tecnico/sbe/
     ├── dto/PersonDto.java      what is sent to / received from the frontend
     └── repository/PersonRepository.java   database access
 
+backend/src/test/groovy/pt/ulisboa/tecnico/sbe/
+├── SpockTest.groovy           shared constants, helpers (createPerson) and deleteAll()
+├── BeanConfiguration.groovy   services needed by the @DataJpaTest tests
+└── person/
+    ├── domain/                *MethodTest: the entity rules
+    ├── service/               *ServiceTest: the use cases
+    └── webservice/            *WebServiceIT: the HTTP endpoints
+
 frontend/src/
 ├── models/            TypeScript versions of the DTOs
 ├── services/RemoteService.ts   every call to the backend
 ├── views/             one folder per page
 ├── components/        shared pieces (top bar, error message, loading)
 └── router/            page routes
+
+frontend/tests/e2e/
+├── specs/people/people.js   one spec per page
+└── support/database.js      cy.deleteAll() and cy.createDemoEntities(), straight SQL on the database
 ```
-
-### Adding a new entity (e.g. `Activity`)
-
-Copy the `person` package and follow the same layers:
-
-1. `activity/domain/Activity.java`: the `@Entity`, built from an `ActivityDto`, checking its own rules in `verifyInvariants()`.
-2. `activity/dto/ActivityDto.java`: plain fields + getters/setters, with a constructor that takes an `Activity`.
-3. `activity/repository/ActivityRepository.java`: `extends JpaRepository<Activity, Integer>`.
-4. `activity/ActivityService.java`: `@Transactional(isolation = Isolation.READ_COMMITTED)` methods that return DTOs.
-5. `activity/ActivityController.java`: `@GetMapping`/`@PostMapping`/... that only call the service.
-6. New error messages go in `exceptions/ErrorMessage.java`, thrown as `new SBEException(...)`.
-7. Frontend: `models/ActivityDto.ts`, the calls in `RemoteService.ts`, a view in `views/activities/` and a route in `router/index.ts`.

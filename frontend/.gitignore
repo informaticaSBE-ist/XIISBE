@@ -15,6 +15,11 @@ coverage
 *.local
 .env
 
+# Cypress
+cypress.env.json
+tests/e2e/videos/
+tests/e2e/screenshots/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
